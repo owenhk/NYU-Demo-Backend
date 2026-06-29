@@ -18,6 +18,7 @@ class StaffShiftSchedules(pydantic.BaseModel):
     start_time: datetime.datetime
     end_time: datetime.datetime
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -66,3 +67,31 @@ async def toggle_power(request: Request):
     except Exception as e:
         return HTTPException(status_code=403, detail="Forbidden")
 
+@app.get("/getrole")
+async def get_role(request: Request):
+    headers = request.headers
+    username = headers.get("username")
+    password = headers.get("password")
+    try:
+        con = await asyncpg.connect(
+            host=os.environ.get("PGHOST"),
+            user=username,
+            password=password,
+            database="railway"
+        )
+        # Check what permisison the user has
+        rows = await con.fetch(
+            """
+            SELECT r.rolname
+            FROM pg_roles r
+                     JOIN pg_auth_members m ON m.roleid = r.oid
+                     JOIN pg_roles u ON u.oid = m.member
+            WHERE u.rolname = $1
+            """,
+            username
+        )
+        roles = [row["rolname"] for row in rows]
+        await con.close()
+        return {"roles": roles}
+    except Exception as e:
+        return HTTPException(status_code=403, detail="Forbidden")
