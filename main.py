@@ -1,11 +1,19 @@
 from fastapi import FastAPI
 from fastapi import Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import asyncpg
 import os
 import pydantic
 import uuid
 import datetime
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class AVEquipmentInventory(pydantic.BaseModel):
     id: uuid.UUID
