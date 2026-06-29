@@ -30,7 +30,7 @@ async def say_hello(request: Request):
     password = headers.get("password")
     try:
         con = await asyncpg.connect(
-            host=os.environ.get("postgres.railway.internal"),
+            host=os.environ.get("PGHOST"),
             user=username,
             password=password,
             database="railway"
@@ -55,7 +55,7 @@ async def toggle_power(request: Request):
     item_id = body["id"]
     try:
         con = await asyncpg.connect(
-            host=os.environ.get("postgres.railway.internal"),
+            host=os.environ.get("PGHOST"),
             user=username,
             password=password,
             database="railway"
